@@ -1,18 +1,5 @@
-function registerdlg()
-    prompt = {'Enter username:', 'Enter password:', 'Confirm password:'};
-    dlgtitle = 'Register';
-    dims = [1 50];
-    definput = {'', '', ''};
-    answer = inputdlg(prompt, dlgtitle, dims, definput);
-    
-    if isempty(answer)
-        return;
-    end
-    
-    username = answer{1};
-    password = answer{2};
-    confirm_password = answer{3};
-    
+function registerdlg(username, password)
+
     % Check if username is already taken
     if isusernameexist(username)
         errordlg('Username already exists.', 'Error');
@@ -28,12 +15,6 @@ function registerdlg()
     % Check password strength
     if ~any(isstrprop(password, 'upper')) || ~any(isstrprop(password, 'lower')) || ~any(isstrprop(password, 'digit'))
         errordlg('Password must contain at least one uppercase letter, one lowercase letter, and one digit.', 'Invalid Password');
-        return;
-    end
-    
-    % Check if passwords match
-    if ~strcmp(password, confirm_password)
-        errordlg('Passwords do not match.', 'Error');
         return;
     end
     
