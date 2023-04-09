@@ -1,4 +1,4 @@
-function logindlg(username, password)
+function success = logindlg(username, password)
     % Check if username is in accounts file
     accountsFile = 'accounts.txt';
     accounts = readAccounts(accountsFile);
@@ -16,8 +16,8 @@ function logindlg(username, password)
         password = '';
         return;
     end
-
     % Display success prompt
     msgbox('Login successful!', 'Success');
-    
+    success = 1;
+    return 
 end
