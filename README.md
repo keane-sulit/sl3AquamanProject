@@ -106,7 +106,7 @@ The application can load images in the following formats:
 
 The maximum text length that can be encrypted will depend on the image size and the image format since the application uses the LSB method to hide the text in the image. The maximum text length can be calculated using the following formula:
 
->`max_text_length = (image_width * image_height * 3) / 8`
+`max_text_length = (image_width * image_height * 3) / 8`
 
 where:
 - `max_text_length` is the maximum text length that can be encrypted.
@@ -115,13 +115,14 @@ where:
 - `3` is the number of color channels in the image (R, G, and B).
 - `8` is the number of bits in a byte.
 
->## ***Warnings***
->1. The application will not be able to encrypt and decrypt text if the text length exceeds the maximum text length.
->
->2. The application will not encrypt and decrypt text if the image is not in the correct format.
->
->3. The application will only work for images in the RGB color space.
->4. All necessary files must be in the same folder.
+## ***Warnings***
+1. The application will not be able to encrypt and decrypt text if the text length exceeds the maximum text length.
+
+2. The application will not encrypt and decrypt text if the image is not in the correct format.
+
+3. The application will only work for images in the RGB color space.
+
+4. All necessary files must be in the same folder.
 
 # **Documentation**
 The full documentation of the project can be found [here]().
