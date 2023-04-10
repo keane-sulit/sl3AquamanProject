@@ -3,11 +3,15 @@ classdef steg_exported < matlab.apps.AppBase
     % Properties that correspond to app components
     properties (Access = public)
         UIFigure                       matlab.ui.Figure
+        Label                          matlab.ui.control.Label
+        LogOutButton                   matlab.ui.control.Button
+        AccountTextArea                matlab.ui.control.TextArea
+        AccountLabel                   matlab.ui.control.Label
         HiddenMessageTextArea          matlab.ui.control.TextArea
         HiddenMessageTextAreaLabel     matlab.ui.control.Label
         DecryptedMessageTextArea       matlab.ui.control.TextArea
         DecryptedMessageTextAreaLabel  matlab.ui.control.Label
-        DecryptButton                  matlab.ui.control.Button
+        DecryptLoadButton              matlab.ui.control.Button
         LoadImageButton                matlab.ui.control.Button
         EncryptButton                  matlab.ui.control.Button
     end
@@ -16,6 +20,10 @@ classdef steg_exported < matlab.apps.AppBase
     properties (Access = public)
         message char % Description
         image
+    end
+    
+    properties (Access = private)
+        CallingApp % Description
     end
     
     methods (Access = private)
@@ -28,8 +36,10 @@ classdef steg_exported < matlab.apps.AppBase
     methods (Access = private)
 
         % Code that executes after component creation
-        function startupFcn(app)
+        function startupFcn(app, LoginRegister, User)
             app.image = [];
+            app.CallingApp = LoginRegister;
+            app.AccountTextArea.Value = char(User);
         end
 
         % Value changed function: HiddenMessageTextArea
@@ -80,12 +90,22 @@ classdef steg_exported < matlab.apps.AppBase
             [file, path] = uiputfile({'*.tiff;*.jpg;*.png;*.bmp'}, 'Save As');
             if file ~= 0
                 imwrite(encrypted_image, fullfile(path, file));
+                hash = DataHash(encrypted_image,'hex','array');
+                name = char(app.AccountTextArea.Value);
+                extension = '.txt';
+                try
+                    fileID = fopen(strcat(name,extension), 'a');
+                    fprintf(fileID, '%s\n', hash);
+                    fclose(fileID);
+                catch ME
+                    errordlg(['Error writing to file: ' ME.message], 'Error');
+                end
                 msgbox('Encryption successful.')
             end
         end
 
-        % Button pushed function: DecryptButton
-        function DecryptButtonPushed(app, event)
+        % Button pushed function: DecryptLoadButton
+        function DecryptLoadButtonPushed(app, event)
              % Prompt user to select encrypted image file
             [filename, filepath] = uigetfile({'*.tiff';'*.jpg;*.jpeg;*.png;*.bmp'}, 'Select encrypted image file');
             
@@ -94,20 +114,58 @@ classdef steg_exported < matlab.apps.AppBase
                 return
             end
             
-            % Call steg_decrypt function to decrypt message from encrypted image
-            decryptedmsg = steg_decrypt(fullfile(filepath, filename));
+            % Check hash
+            hash = DataHash(imread(strcat(filepath,filename)),'hex','array');
+            name = char(app.AccountTextArea.Value);
+            extension = '.txt';
+            fileID = fopen(strcat(name,extension), 'r');
+            hash_exist = false;
             
-            % Display decrypted message in app
-            app.DecryptedMessageTextArea.Value = decryptedmsg;
+            if exist(strcat(name,extension), 'file') == 2
+                % File exists.
+                while ~feof(fileID)
+                    saved_hash = fgetl(fileID);
+                    if isempty(saved_hash)
+                        continue;
+                    end
+                    if strcmpi(saved_hash, hash);
+                        hash_exist = true;
+                        break;
+                    end
+                end
+            else
+                % Error dialog
+                errordlg('Decryption error!');
+            end
             
-            % Show success message
-            msgbox('Message decrypted successfully.', 'Success', 'modal');
+            fclose(fileID);
+            if hash_exist == false
+                errordlg('Decryption error!');
+                return;
+            else 
+                % Call steg_decrypt function to decrypt message from encrypted image
+                decryptedmsg = steg_decrypt(fullfile(filepath, filename));
+                % Display decrypted message in app
+                app.DecryptedMessageTextArea.Value = decryptedmsg;
+                % Show success message
+                msgbox('Message decrypted successfully.', 'Success', 'modal');
+            end
         end
 
         % Value changed function: DecryptedMessageTextArea
         function DecryptedMessageTextAreaValueChanged(app, event)
             value = app.DecryptedMessageTextArea.Value;
-            
+        end
+
+        % Value changed function: AccountTextArea
+        function AccountTextAreaValueChanged(app, event)
+            value = app.AccountTextArea.Value;
+        end
+
+        % Button pushed function: LogOutButton
+        function LogOutButtonPushed(app, event)
+            main;
+            app.delete;
         end
     end
 
@@ -125,44 +183,82 @@ classdef steg_exported < matlab.apps.AppBase
             % Create EncryptButton
             app.EncryptButton = uibutton(app.UIFigure, 'push');
             app.EncryptButton.ButtonPushedFcn = createCallbackFcn(app, @EncryptButtonPushed, true);
-            app.EncryptButton.Position = [420 323 100 23];
+            app.EncryptButton.FontName = 'Avenir';
+            app.EncryptButton.Position = [437 266 100 23];
             app.EncryptButton.Text = 'Encrypt';
 
             % Create LoadImageButton
             app.LoadImageButton = uibutton(app.UIFigure, 'push');
             app.LoadImageButton.ButtonPushedFcn = createCallbackFcn(app, @LoadImageButtonPushed, true);
-            app.LoadImageButton.Position = [420 358 100 23];
+            app.LoadImageButton.FontName = 'Avenir';
+            app.LoadImageButton.Position = [437 301 100 23];
             app.LoadImageButton.Text = 'Load Image';
 
-            % Create DecryptButton
-            app.DecryptButton = uibutton(app.UIFigure, 'push');
-            app.DecryptButton.ButtonPushedFcn = createCallbackFcn(app, @DecryptButtonPushed, true);
-            app.DecryptButton.Position = [87 202 100 23];
-            app.DecryptButton.Text = 'Decrypt';
+            % Create DecryptLoadButton
+            app.DecryptLoadButton = uibutton(app.UIFigure, 'push');
+            app.DecryptLoadButton.ButtonPushedFcn = createCallbackFcn(app, @DecryptLoadButtonPushed, true);
+            app.DecryptLoadButton.FontName = 'Avenir';
+            app.DecryptLoadButton.Position = [104 145 100 23];
+            app.DecryptLoadButton.Text = 'Decrypt / Load';
 
             % Create DecryptedMessageTextAreaLabel
             app.DecryptedMessageTextAreaLabel = uilabel(app.UIFigure);
             app.DecryptedMessageTextAreaLabel.HorizontalAlignment = 'center';
             app.DecryptedMessageTextAreaLabel.WordWrap = 'on';
-            app.DecryptedMessageTextAreaLabel.Position = [196 148 71 30];
+            app.DecryptedMessageTextAreaLabel.FontName = 'Avenir';
+            app.DecryptedMessageTextAreaLabel.Position = [213 91 71 30];
             app.DecryptedMessageTextAreaLabel.Text = 'Decrypted Message';
 
             % Create DecryptedMessageTextArea
             app.DecryptedMessageTextArea = uitextarea(app.UIFigure);
             app.DecryptedMessageTextArea.ValueChangedFcn = createCallbackFcn(app, @DecryptedMessageTextAreaValueChanged, true);
-            app.DecryptedMessageTextArea.Position = [272 101 248 124];
+            app.DecryptedMessageTextArea.Editable = 'off';
+            app.DecryptedMessageTextArea.FontName = 'Avenir';
+            app.DecryptedMessageTextArea.Position = [289 44 248 124];
 
             % Create HiddenMessageTextAreaLabel
             app.HiddenMessageTextAreaLabel = uilabel(app.UIFigure);
             app.HiddenMessageTextAreaLabel.HorizontalAlignment = 'center';
             app.HiddenMessageTextAreaLabel.WordWrap = 'on';
-            app.HiddenMessageTextAreaLabel.Position = [87 305 66 29];
+            app.HiddenMessageTextAreaLabel.FontName = 'Avenir';
+            app.HiddenMessageTextAreaLabel.Position = [104 247 66 30];
             app.HiddenMessageTextAreaLabel.Text = 'Hidden Message';
 
             % Create HiddenMessageTextArea
             app.HiddenMessageTextArea = uitextarea(app.UIFigure);
             app.HiddenMessageTextArea.ValueChangedFcn = createCallbackFcn(app, @HiddenMessageTextAreaValueChanged, true);
-            app.HiddenMessageTextArea.Position = [163 257 248 124];
+            app.HiddenMessageTextArea.FontName = 'Avenir';
+            app.HiddenMessageTextArea.Position = [180 200 248 124];
+
+            % Create AccountLabel
+            app.AccountLabel = uilabel(app.UIFigure);
+            app.AccountLabel.HorizontalAlignment = 'right';
+            app.AccountLabel.FontName = 'Avenir';
+            app.AccountLabel.Position = [109 363 49 22];
+            app.AccountLabel.Text = 'Account';
+
+            % Create AccountTextArea
+            app.AccountTextArea = uitextarea(app.UIFigure);
+            app.AccountTextArea.ValueChangedFcn = createCallbackFcn(app, @AccountTextAreaValueChanged, true);
+            app.AccountTextArea.Editable = 'off';
+            app.AccountTextArea.FontName = 'Avenir';
+            app.AccountTextArea.FontWeight = 'bold';
+            app.AccountTextArea.Position = [173 366 150 21];
+
+            % Create LogOutButton
+            app.LogOutButton = uibutton(app.UIFigure, 'push');
+            app.LogOutButton.ButtonPushedFcn = createCallbackFcn(app, @LogOutButtonPushed, true);
+            app.LogOutButton.FontName = 'Avenir';
+            app.LogOutButton.Position = [437 364 100 23];
+            app.LogOutButton.Text = 'Log Out';
+
+            % Create Label
+            app.Label = uilabel(app.UIFigure);
+            app.Label.HorizontalAlignment = 'center';
+            app.Label.FontName = 'Avenir';
+            app.Label.FontSize = 16;
+            app.Label.Position = [36 396 571 43];
+            app.Label.Text = 'A Steganographic Text Encryption and Decryption Application in MATLAB';
 
             % Show the figure after all components are created
             app.UIFigure.Visible = 'on';
@@ -173,7 +269,7 @@ classdef steg_exported < matlab.apps.AppBase
     methods (Access = public)
 
         % Construct app
-        function app = steg_exported
+        function app = steg_exported(varargin)
 
             % Create UIFigure and components
             createComponents(app)
@@ -182,7 +278,7 @@ classdef steg_exported < matlab.apps.AppBase
             registerApp(app, app.UIFigure)
 
             % Execute the startup function
-            runStartupFcn(app, @startupFcn)
+            runStartupFcn(app, @(app)startupFcn(app, varargin{:}))
 
             if nargout == 0
                 clear app
