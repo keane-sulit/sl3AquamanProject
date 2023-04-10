@@ -8,11 +8,16 @@
   * [Main Features](#main-features)
   * [Additional Features](#additional-features)
   * [Error Handling Features](#error-handling-features)
+  * [Additional Possible Features (For Developers)](#additional-possible-features--for-developers-)
+- [Bugs](#bugs)
 - [Installation](#installation)
 - [Usage](#usage)
+- [Compatibility](#compatibility)
 - [Documentation](#documentation)
 - [Contributing](#contributing)
 - [License](#license)
+
+##### *Build Number: 2023.04.10.1.0*
 # **Overview**
 ###### ***DISCLAIMER:*** *This project is for educational purposes only. The authors are not responsible for any misuse of the application.*
 
@@ -20,11 +25,19 @@ This project was created as a partial fulfillment of the requirements for the co
 
 The project was created using MATLAB R2022b/R2023a, and is a fully functional application that can encrypt and decrypt text using steganography. The application can be used to hide text messages in images, and can also be used to extract hidden text messages from images. The application is also unique to a specific user, as it uses MD5 hashing to hash the user's credentials as a key to encrypt and decrypt the text.
 
+The flowchart of the application is shown below:
+
+![Flowchart]()
+
 # **Files**
 The project has the following files:
 - `main.m` - The main script of the application. It runs the GUI of the login and registration page.
 
+![Main GUI](mainGUI.png)
+
 - `steg.m` - The script that allows the user to encrypt and decrypt text using image-based steganography.
+
+![Steg GUI](stegGUI.png)
 
 - `encrypt.m` - The script that encrypts text using steganography.
 
@@ -59,21 +72,70 @@ The application has the following features:
 ## Error Handling Features
 - Checks if the username entered by the user already exists in the application
 - Checks if the user entered the correct credentials when logging in
-- Checks if the user entered the correct credential requiremnents when registering
+- Checks if the user entered the correct credential requirements when registering
 - Checks if the user has access to decrypt the text in the image
 
+## Additional Possible Features (For Developers)
+- Allows the user to change the password
+- Allows the user to delete the account
+- Allows the user to delete their past encryptions
+- Allows the user to save the encrypted text in a text file
+- Improve the GUI
+- Improve the error handling features
+- Improve dialog boxes (currently uses MATLAB's default dialog boxes)
+
+*Note: The additional possible features are not included in the project.*
+
+# **Bugs**
+The application has the following bugs:
+- When loading an image file with an existing encrypted text, the application proceeds to load the image. An error should be thrown instead.
 # **Installation**
 To install the application, clone the repository or download as a `.zip` file. 
 
 # **Usage**
 To use the application, Rrun the `main.m` file in a MATLAB script. It can also be run directly in the MATLAB command window.
 
+# **Compatibility**
+The application is compatible with MATLAB R2022b/R2023a.
+
+The application can load images in the following formats:
+- `.tiff`
+- `.jpg`
+- `.png`
+- `.bmp`
+
+The maximum text length that can be encrypted will depend on the image size and the image format since the application uses the LSB method to hide the text in the image. The maximum text length can be calculated using the following formula:
+
+>`max_text_length = (image_width * image_height * 3) / 8`
+
+where:
+- `max_text_length` is the maximum text length that can be encrypted.
+- `image_width` is the width of the image in pixels.
+- `image_height` is the height of the image in pixels.
+- `3` is the number of color channels in the image (R, G, and B).
+- `8` is the number of bits in a byte.
+
+>## ***Warnings***
+>1. The application will not be able to encrypt and decrypt text if the text length exceeds the maximum text length.
+>
+>2. The application will not encrypt and decrypt text if the image is not in the correct format.
+>
+>3. The application will only work for images in the RGB color space.
+>4. All necessary files must be in the same folder.
+
 # **Documentation**
 The full documentation of the project can be found [here]().
 A demonstration of the application can be found [here]().
 
+Demo video:
+
+[![Demo Video]()](https://www.youtube.com/watch?v=)
+
 # **Contributing**
-If you wish to contribute to the project, fork the repository and create a pull request.
+If you wish to contribute to the project, fork the repository and create a pull request or email the authors at the following email addresses:
+- Rocelle Belandres - `rocelle_andrea_belandres@dlsu.edu.ph`
+- Jelo Laca - `jean_lenard_laca@dlsu.edu.ph`
+- Keane Sulit - `keane_sulit@dlsu.edu.ph`
 
 # **License**
 This project has no license. 
