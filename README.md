@@ -14,6 +14,7 @@
 - [Usage](#usage)
 - [Compatibility](#compatibility)
 - [Documentation](#documentation)
+  * [Demo Video (Click on the image to view the video):](#demo-video--click-on-the-image-to-view-the-video-)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -126,11 +127,11 @@ where:
 
 # **Documentation**
 The full documentation of the project can be found [here]().
-A demonstration of the application can be found [here]().
+A demonstration of the application can be found here.
 
-Demo video:
+## ***Demo Video (Click on the image to view the video):***
 
-[![Demo Video]()](https://www.youtube.com/watch?v=)
+[![Demo Video](sl3AquamanPresentation.png)](https://www.youtube.com/watch?v=gm-PAYuWWDI&ab_channel=JeanLenardLaca)
 
 # **Contributing**
 If you wish to contribute to the project, fork the repository and create a pull request or email the authors at the following email addresses:
