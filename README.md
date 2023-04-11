@@ -25,9 +25,9 @@ This project was created as a partial fulfillment of the requirements for the co
 
 The project was created using MATLAB R2022b/R2023a, and is a fully functional application that can encrypt and decrypt text using steganography. The application can be used to hide text messages in images, and can also be used to extract hidden text messages from images. The application is also unique to a specific user, as it uses MD5 hashing to hash the user's credentials as a key to encrypt and decrypt the text.
 
-The flowchart of the application is shown below:
+The hierarchy chart of the application is shown below:
 
-![Flowchart]()
+![Hierarchy Chart](hierarchy_chart.png)
 
 # **Files**
 The project has the following files:
